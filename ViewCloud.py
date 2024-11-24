@@ -2,11 +2,7 @@ import open3d as o3d
 import os
 
 def load_and_visualize_ply(file_path):
-    """
-    Load and visualize a .ply point cloud file.
-    Args:
-        file_path: Path to the .ply file.
-    """
+
     if not os.path.exists(file_path):
         print(f"File {file_path} does not exist.")
         return
