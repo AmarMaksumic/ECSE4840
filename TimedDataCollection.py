@@ -79,7 +79,7 @@ def main():
             print(f"Saved {output_filename}")
 
             count += 1
-            time.sleep(2)  # Change this to adjust sampling frequency. Most likely cannot go shorter than 1 second.
+            time.sleep(0.75)  # Change this to adjust sampling frequency. Most likely cannot go shorter than 1 second.
 
     except KeyboardInterrupt:
         print("Stopping capture.")
