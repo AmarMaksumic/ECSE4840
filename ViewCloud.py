@@ -8,7 +8,7 @@ def cycle_point_clouds(folder_path):
         print(f"No .ply files found in {folder_path}.")
         return
 
-    index = 0
+    index = 54
     while True:
         file_path = os.path.join(folder_path, ply_files[index])
         print(f"Loading point cloud from {file_path}...")
@@ -20,21 +20,12 @@ def cycle_point_clouds(folder_path):
             print("Displaying point cloud. Use mouse and keyboard to navigate.")
             o3d.visualization.draw_geometries([point_cloud],
                                                 window_name="Point Cloud Viewer",
-                                                width=800,
-                                                height=600,
+                                                width=1200,
+                                                height=900,
                                                 left=50,
                                                 top=50,
                                                 point_show_normal=False)
-
-        key = input("Press 'n' for next, 'p' for previous, 'q' to quit: ").strip().lower()
-        if key == 'n':
-            index = (index + 2) % len(ply_files)
-        elif key == 'p':
-            index = (index - 1) % len(ply_files)
-        elif key == 'q':
-            break
-        else:
-            print("Invalid key. Please press 'n', 'p', or 'q'.")
+        index+=1
 
 
 
