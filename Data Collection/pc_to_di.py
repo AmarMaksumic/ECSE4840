@@ -7,14 +7,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 import cv2
 
-def pointcloud_to_depth_image(pointcloud_file, img_width=640, img_height=480, focal_length=350):
+def pointcloud_to_depth_image(pointcloud_file, img_width=640, img_height=480, focal_length=200):
     # Load point cloud
     pcd = o3d.io.read_point_cloud(pointcloud_file)
     points = np.asarray(pcd.points)
 
     # Extract x, y, z coordinates
     x, y, z = points[:, 0], points[:, 1], points[:, 2]
-    print(len(x), len(y), len(z))
+    # print(len(x), len(y), len(z))
 
     # Project 3D points to 2D (simple perspective projection)
     u = (focal_length * x / z).astype(int) + img_width // 2
@@ -23,6 +23,10 @@ def pointcloud_to_depth_image(pointcloud_file, img_width=640, img_height=480, fo
     # Initialize an image array with maximum possible depth
     depth_image = np.full((img_height, img_width), np.inf)
 
+    # min_z = np.max(z)
+    
+    # print(f"max z: {z}")
+    
     # Map depth (z) values to the 2D coordinates
     for i in range(len(z)):
         if 0 <= u[i] < img_width and 0 <= v[i] < img_height:
@@ -42,22 +46,28 @@ def pointcloud_to_depth_image(pointcloud_file, img_width=640, img_height=480, fo
     # This is to remove outliers (e.g., background points) and allow us to scale the depth values by "zooming in" to the second deviation
 
     # print(depth_image)
+    
+    min_depth_val = 0.0001 # Controls the near bound
+    max_depth_val = 0.630000 # Controls the far bound
 
-    mean_depth = np.mean(depth_image[(depth_image > 0.10000) & (depth_image < 0.60000)])
-    std_depth = np.std(depth_image[(depth_image > 0.10000) & (depth_image < 0.60000)])
+    mean_depth = np.mean(depth_image[(depth_image > min_depth_val) & (depth_image < max_depth_val)])
+    std_depth = np.std(depth_image[(depth_image > min_depth_val) & (depth_image < max_depth_val)])
 
     # Normalize depth values to mean +/- 2*std for better visualization
-    print(f"Mean depth: {mean_depth}, Std depth: {std_depth}")
+    #print(f"Mean depth: {mean_depth}, Std depth: {std_depth}")
+    
+    depth_norm_param = 1.75
     
     # if point is less than mean_depth - std_depth, set it to mean_depth - std_depth
-    depth_image[depth_image < mean_depth - 1.75*std_depth] = mean_depth - 1.75*std_depth
+    depth_image[depth_image < mean_depth - depth_norm_param*std_depth] = mean_depth - depth_norm_param*std_depth
 
     # if point is greater than mean_depth + std_depth, set it to mean_depth + std_depth
-    depth_image[depth_image > mean_depth + 1.75*std_depth] = mean_depth + 1.75*std_depth
+    depth_image[depth_image > mean_depth + depth_norm_param*std_depth] = mean_depth + depth_norm_param*std_depth
 
 
-
-    depth_image = np.clip((depth_image - mean_depth) / (2 * std_depth), -1, 1)
+    std_depth_param = 1.75
+    
+    depth_image = np.clip((depth_image - mean_depth) / (std_depth_param * std_depth), -1, 1)
 
     # Normalize depth values to 0-255 for visualization
     depth_image_normalized = (2**16 * (depth_image / max_depth)).astype(np.uint16)
@@ -67,29 +77,29 @@ def pointcloud_to_depth_image(pointcloud_file, img_width=640, img_height=480, fo
 
     # Display the depth image
     cv2.imshow('Depth Image', depth_image_normalized)
-    cv2.waitKey(20)
+    cv2.waitKey(10)
 
     return depth_image_normalized
 
 def main():
     print("Enter the full path to the folder containing the point clouds.")
-    folder_path = "rock" #input("Path to folder: ").strip()
+    folder_path = "G:/My Drive/RPI/Classes/Intro to ML/FInal Project/Data Collection/Dec08_233201/" #input("Path to folder: ").strip()
 
     print("Enter the full path to the folder where you want to save the depth images.")
-    output_folder = "outrock" #input("Path to output folder: ").strip()
-
+    output_folder = "G:/My Drive/RPI/Classes/Intro to ML/FInal Project/Data Collection/#nndi/"#input("Path to output folder: ").strip()
+    prefix = "nnhangloose"
     print(os.listdir(folder_path))
 
     # Load all point clouds in the folder
     pcd_files = [f for f in os.listdir(folder_path) if f.endswith('.ply')]
     for pcd_file in pcd_files:
-        print(f"Processing {pcd_file}...")
-        depth_image = pointcloud_to_depth_image(os.path.join(folder_path, pcd_file))
+        #print(f"Processing {pcd_file}...")
+        depth_image = pointcloud_to_depth_image(os.path.join(folder_path, pcd_file), focal_length=350)
 
         # Save the depth image
-        depth_image_file = os.path.join(output_folder, f"{pcd_file[:-4]}.png")
+        depth_image_file = os.path.join(output_folder, f"{prefix}{pcd_file[:-4]}.png")
         cv2.imwrite(depth_image_file, depth_image)
 
-        print(f"Depth image saved to {depth_image_file}")
+        #print(f"Depth image saved to {depth_image_file}")
 
 main()

@@ -33,7 +33,8 @@ def main():
 
     # Create new directory based on the current date and time
     current_time = datetime.now().strftime("%b%d_%H%M%S")
-    output_dir = os.path.join(os.getcwd(), current_time)
+    current_dir = "G:/My Drive/RPI/Classes/Intro to ML/FInal Project/Data Collection"
+    output_dir = os.path.join(current_dir, current_time)
     os.makedirs(output_dir, exist_ok=True)
 
     # Configure RealSense pipeline

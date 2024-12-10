@@ -14,7 +14,7 @@ def rename_pointclouds(folder_path):
 
 def main():
     print("Enter the full path to the folder containing the point clouds.")
-    folder_path = "Dec06_211933" #input("Path to folder: ").strip()
+    folder_path = "Dec08_211933" #input("Path to folder: ").strip()
 
     rename_pointclouds(folder_path)
 

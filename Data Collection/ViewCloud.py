@@ -8,7 +8,7 @@ def cycle_point_clouds(folder_path):
         print(f"No .ply files found in {folder_path}.")
         return
 
-    index = 54
+    index = 0
     while True:
         file_path = os.path.join(folder_path, ply_files[index])
         print(f"Loading point cloud from {file_path}...")
@@ -25,7 +25,7 @@ def cycle_point_clouds(folder_path):
                                                 left=50,
                                                 top=50,
                                                 point_show_normal=False)
-        index+=1
+        index+=2
 
 
 
@@ -39,11 +39,11 @@ def rename_files_in_folder(folder_path):
         os.makedirs(new_folder_path)
 
     for file in os.listdir(folder_path):
-        if file.endswith(".ply"):
+        if file.endswith(".png"):
             old_file_path = os.path.join(folder_path, file)
             base_name, ext = os.path.splitext(file)
-            if ext == ".ply":
-                new_file_name = f"pointcloud_{new_number:03d}.ply"
+            if ext == ".png":
+                new_file_name = f"pointcloud_{new_number:03d}.png"
                 new_file_path = os.path.join(new_folder_path, new_file_name)
                 os.rename(old_file_path, new_file_path)
                 print(f"Renamed {old_file_path} to {new_file_path}")
